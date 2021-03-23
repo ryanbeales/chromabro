@@ -7,7 +7,7 @@ This is like what some other apps use for the same effect (Zoom, Teams, Nvidia B
 
 The intended use for this was to feed in to OBS and utilize the chroma key plugin to overlay video there.
 
-Initially I tried using a plan webpage https://www.ryanbeales.com/webcamgreenscreen/index.html within a browser input but the chrome instance within OBS will not use the webcam without verifying the webcam permissions. There are tricks/hacks but it was not possible on macos. By making this a separate app I can use that as input to OBS and avoid the permissions problem.
+Initially I tried using a plan webpage https://www.ryanbeales.com/webcamgreenscreen/index.html within a browser input but the chrome instance in OBS will not use the webcam without verifying the webcam permissions. There are tricks/hacks but it was not possible on macos. By making this a separate app I can use that as input to OBS and avoid the permissions problem.
 
 # Installing
 See releases.
@@ -24,7 +24,6 @@ npm i --save-dev electron
 npm install --save-dev @electron-forge/cli
 npx electron-forge import
 npm run make
-
 ```
 
 # External Libraries

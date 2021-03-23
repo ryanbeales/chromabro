@@ -4,7 +4,6 @@
   "description": "A simple app that will take webcam input, use tensorflow+bodypix to segment the image in two parts (background and person) and then set the background to a generic green screen for chroma keying later.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
@@ -18,7 +17,9 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.54",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
-    "electron": "^12.0.1"
+    "electron": "^12.0.1",
+    "electron-builder": "^22.10.5"
+
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
@@ -30,7 +31,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "auto_greenscreen_webcam"
+            "name": "chromabro"
           }
         },
         {
