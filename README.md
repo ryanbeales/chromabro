@@ -19,16 +19,16 @@ See releases. The app is not signed so you'll have to work around macos permissi
 # References:
 
 ## External Libraries
-https://cdn.jsdelivr.net/npm/@tensorflow/tfjs
-https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix
+- https://cdn.jsdelivr.net/npm/@tensorflow/tfjs
+- https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix
 
 
 ## Bodypix
-https://blog.francium.tech/edit-live-video-background-with-webrtc-and-tensorflow-js-c67f92307ac5
-https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README-v1.md
-https://blog.tensorflow.org/2019/11/updated-bodypix-2.html
-https://jameshfisher.com/2020/09/23/running-bodypix-on-a-video-stream/
+- https://blog.francium.tech/edit-live-video-background-with-webrtc-and-tensorflow-js-c67f92307ac5
+- https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README-v1.md
+- https://blog.tensorflow.org/2019/11/updated-bodypix-2.html
+- https://jameshfisher.com/2020/09/23/running-bodypix-on-a-video-stream/
 
 ## Electron
-https://www.electronjs.org/docs/tutorial/quick-start
-https://github.com/samuelmeuli/action-electron-builder
+- https://www.electronjs.org/docs/tutorial/quick-start
+- https://github.com/samuelmeuli/action-electron-builder
