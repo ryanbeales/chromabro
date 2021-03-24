@@ -1,7 +1,7 @@
 {
   "name": "chromabro",
   "version": "0.1.0",
-  "description": "A simple app that will take webcam input, use tensorflow+bodypix to segment the image in two parts (background and person) and then set the background to a generic green screen for chroma keying later.",
+  "description": "A simple app that will take webcam input, use tensorflow+bodypix to segment the image in two parts (background and person) and place the video in the lower right of screen.",
   "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
