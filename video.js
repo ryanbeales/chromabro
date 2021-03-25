@@ -1,9 +1,6 @@
 const videoElement = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 
-//const ctx = canvas.getContext('2d');
-
-// GL related
 const gl = canvas.getContext('webgl', { premultipliedAlpha: false});
 
 const vs = gl.createShader(gl.VERTEX_SHADER);
@@ -31,14 +28,19 @@ const coordLoc = gl.getAttribLocation(prog, 'c');
 gl.vertexAttribPointer(coordLoc, 2, gl.FLOAT, false, 0, 0);
 gl.enableVertexAttribArray(coordLoc);
 
-gl.activeTexture(gl.TEXTURE0);
+
+const videotexture = gl.TEXTURE0
+const masktexture = gl.TEXTURE1
+
+
+gl.activeTexture(videotexture);
 const frame = gl.createTexture();
 gl.bindTexture(gl.TEXTURE_2D, frame);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
-gl.activeTexture(gl.TEXTURE1);
+gl.activeTexture(masktexture);
 const background = gl.createTexture();
 gl.bindTexture(gl.TEXTURE_2D, background);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -50,37 +52,21 @@ const maskTexLoc = gl.getUniformLocation(prog, "mask");
 const texWidthLoc = gl.getUniformLocation(prog, "texWidth");
 const texHeightLoc = gl.getUniformLocation(prog, "texHeight");
 
+
 // Render related...
 
 let net = null 
 
-window.onload = () => {
-  navigator.mediaDevices.getUserMedia({video: { facingMode: 'user', width: videoElement.width, height: videoElement.height}, audio: false})
-    .then(stream => {
-      videoElement.srcObject = stream;
-      videoElement.play();
-    })
-    .catch(err => {
-      alert(`Following error occured: ${err}`);
-    });
-
-
-    // https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README.md
-    bodyPix.load({
-      //architecture: 'ResNet50',
-      multiplier: 1,
-      stride: 16,
-      quantBytes: 4
-    }).then(function (net2) { net = net2; })
-}
 
 function renderVideo(now, metadata) {
   canvas.width = videoElement.width
   canvas.height = videoElement.height
 
   gl.viewport(0, 0, metadata.width, metadata.height);
-  gl.activeTexture(gl.TEXTURE0);
+  gl.activeTexture(videotexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
+
+
   gl.uniform1i(frameTexLoc, 0);
   gl.uniform1i(maskTexLoc, 1);
   gl.uniform1f(texWidthLoc, videoElement.width);
@@ -96,11 +82,7 @@ async function renderMask(now, metadata) {
   if (net) {
     const personSegmentation = await net.segmentPerson(videoElement);
 
-    // const foregroundColor = {r: 0, g: 0, b: 0, a: 0}
-    // const backgroundColor = {r: 0, g: 128, b: 0, a: 255}
-    // personMask = bodyPix.toMask(personSegmentation, foregroundColor, backgroundColor);
-
-    gl.activeTexture(gl.TEXTURE1);
+    gl.activeTexture(masktexture);
     gl.texImage2D(
       gl.TEXTURE_2D,        // target 
       0,                    // level
@@ -117,3 +99,45 @@ async function renderMask(now, metadata) {
   }
 }
 videoElement.requestVideoFrameCallback(renderMask)
+
+
+function start_webcam() {
+  // Find some way to list and allow selection of cameras?
+  navigator.mediaDevices.getUserMedia({video: { facingMode: 'user', width: videoElement.width, height: videoElement.height}, audio: false})
+    .then(stream => {
+      videoElement.srcObject = stream;
+      videoElement.play();
+    })
+    .catch(err => {
+      alert(`Following error occured: ${err}`);
+    });
+}
+
+
+function start_bodypix() {
+      // We can reload this at execution time to change options?
+      // https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README.md
+      bodyPix.load({
+        //architecture: 'ResNet50',
+        multiplier: 1,
+        stride: 16,
+        quantBytes: 4
+      }).then(function (net2) { net = net2; })  
+}
+
+window.onload = () => {
+    start_webcam()
+    start_bodypix()
+}
+
+
+// Context Menu
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault()
+  window.ipcRenderer.send('show-context-menu')
+})
+
+window.ipcRenderer.on('context-menu-command', (e, command) => {
+  console.log('Hello!')
+  console.log(command)
+})

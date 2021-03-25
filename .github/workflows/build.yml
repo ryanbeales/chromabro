@@ -1,10 +1,9 @@
 name: Build/release
 
 on:
-  push:
-    branches:
-      - "main"
-
+  release:
+    types: [created]
+    
 jobs:      
   # Build binaries for Windows and Macos
   # TODO: Ubuntu build fails because we need to install snap first
