@@ -6,12 +6,14 @@ on:
       - "main"
 
 jobs:
+  # Docs here: https://github.com/marketplace/actions/update-version-in-package-json
+  # Use 'patch', 'minor', 'major' in commit messages to auto increment each value
+  # And create a tag
   version_bump:
     steps:
-          name: "Bump Version on PR"
+          name: "Bump Version on main"
     runs-on: ubuntu-latest
 
-    steps:
       - name: "Checkout source code"
         uses: "actions/checkout@v2"
         with:
@@ -27,6 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
+  # Build binaries for Windows and Macos
+  # TODO: Ubuntu build fails because we need to install snap first
   release:
     runs-on: ${{ matrix.os }}
 
