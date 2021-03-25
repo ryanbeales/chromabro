@@ -58,34 +58,6 @@ const texHeightLoc = gl.getUniformLocation(prog, "texHeight");
 let net = null 
 
 
-function start_webcam() {
-  // Find some way to list and allow selection of cameras?
-  navigator.mediaDevices.getUserMedia({video: { facingMode: 'user', width: videoElement.width, height: videoElement.height}, audio: false})
-    .then(stream => {
-      videoElement.srcObject = stream;
-      videoElement.play();
-    })
-    .catch(err => {
-      alert(`Following error occured: ${err}`);
-    });
-}
-
-function start_bodypix() {
-      // We can reload this at execution time to change options?
-      // https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README.md
-      bodyPix.load({
-        //architecture: 'ResNet50',
-        multiplier: 1,
-        stride: 16,
-        quantBytes: 4
-      }).then(function (net2) { net = net2; })  
-}
-
-window.onload = () => {
-    start_webcam()
-    start_bodypix()
-}
-
 function renderVideo(now, metadata) {
   canvas.width = videoElement.width
   canvas.height = videoElement.height
@@ -127,3 +99,45 @@ async function renderMask(now, metadata) {
   }
 }
 videoElement.requestVideoFrameCallback(renderMask)
+
+
+function start_webcam() {
+  // Find some way to list and allow selection of cameras?
+  navigator.mediaDevices.getUserMedia({video: { facingMode: 'user', width: videoElement.width, height: videoElement.height}, audio: false})
+    .then(stream => {
+      videoElement.srcObject = stream;
+      videoElement.play();
+    })
+    .catch(err => {
+      alert(`Following error occured: ${err}`);
+    });
+}
+
+
+function start_bodypix() {
+      // We can reload this at execution time to change options?
+      // https://github.com/tensorflow/tfjs-models/blob/master/body-pix/README.md
+      bodyPix.load({
+        //architecture: 'ResNet50',
+        multiplier: 1,
+        stride: 16,
+        quantBytes: 4
+      }).then(function (net2) { net = net2; })  
+}
+
+window.onload = () => {
+    start_webcam()
+    start_bodypix()
+}
+
+
+// Context Menu
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault()
+  window.ipcRenderer.send('show-context-menu')
+})
+
+window.ipcRenderer.on('context-menu-command', (e, command) => {
+  console.log('Hello!')
+  console.log(command)
+})
