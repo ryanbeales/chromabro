@@ -1,8 +1,9 @@
 name: Build/release
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: 
+      - main
     
 jobs:      
   # Build binaries for Windows and Macos
