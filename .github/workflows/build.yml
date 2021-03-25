@@ -5,31 +5,7 @@ on:
     branches:
       - "main"
 
-jobs:
-  # Docs here: https://github.com/marketplace/actions/update-version-in-package-json
-  # Use 'patch', 'minor', 'major' in commit messages to auto increment each value
-  # And create a tag
-  version_bump:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: "Checkout source code"
-        uses: "actions/checkout@v2"
-        with:
-          ref: ${{ github.ref }}
-
-      - name: "Setup Node.js"
-        uses: "actions/setup-node@v1"
-        with:
-          node-version: 15
-          
-      - name: "Automated Version Bump"
-        uses: "phips28/gh-action-bump-version@master"
-        with:
-          tag-prefix: 'v'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+jobs:      
   # Build binaries for Windows and Macos
   # TODO: Ubuntu build fails because we need to install snap first
   release:
