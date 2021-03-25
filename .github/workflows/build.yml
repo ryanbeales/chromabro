@@ -1,6 +1,9 @@
 name: Build/release
 
-on: push
+on:
+  push:
+    branches:
+      - "main"
 
 jobs:
   release:
@@ -18,6 +21,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 15
+
+      - name: "Automated Version Bump"
+        uses: "phips28/gh-action-bump-version@master"
+        with:
+          tag-prefix: 'v'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Install package dependancies
         run: npm install
