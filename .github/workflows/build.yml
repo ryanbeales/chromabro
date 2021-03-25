@@ -2,8 +2,8 @@ name: Build/release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+    - 'v*'
 
 jobs:      
   # Build binaries for Windows and Macos
