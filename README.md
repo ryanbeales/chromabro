@@ -16,6 +16,18 @@ See releases. The app is not signed so you'll have to work around macos permissi
 - The mask is slower to render than the video so it will lag on sudden movements.
 - Some backgrounds can confuse it, it's best to have a boring background like a wall (in my case it confuses a jacket hanging behind me with a bit of me, but it's pretty good)
 
+# Contibuting
+- Create a new release branch (v0.0.0 format)
+- Update package.json with same release number
+- Make changes
+- Push to origin
+- Create a PR for a new release
+- Approve/merge PR
+- `git checkout main; git pull` locally
+- Create a new tag for release (v0.0.0) format. `git tag v0.0.0`
+- Push tags to origin `git push --tags origin`
+- Build will run and create a draft release.
+
 # References:
 
 ## External Libraries
