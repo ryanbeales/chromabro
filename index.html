@@ -8,12 +8,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
+    <link rel="stylesheet" href="video.css">
   </head>
 
-  <body style="background: rgba(0,0,0,0); -webkit-app-region: drag"  >
+  <body id="body">
     <video id="video" hidden width="480" height="320" autoplay playsinline></video>
     <canvas id="videocanvas" hidden></canvas>
     <canvas id="renderedcanvas"></canvas>
+    <div id="statsoverlay_background" hidden>
+      <div id="statsoverlay">
+        <p>Video Framerate: <span id="statsoverlay-video-fps">0</span></p>
+        <p>Segmentation framerate: <span id="statsoverlay-segmentation-fps">0</span></p>
+        <p>Bodypix multiplier: <span id="statsoverlay-multiplier">0</span></p>
+        <p>Bodypix internal resolution: <span id="statsoverlay-internal-resolution">0</span></p>
+      </div>
+    </div>
   </body>
 
   <script src="video.js"></script>
