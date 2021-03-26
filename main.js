@@ -1,17 +1,21 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron')
+const { app, BrowserWindow, screen } = require('electron')
+
 const path = require('path')
+
+let win;
 
 function createWindow () {
 
   const display = screen.getPrimaryDisplay()
 
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 520,
     height: 420,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      enableRemoteModule: false
+      enableRemoteModule: false,
+      devTools: false
     },
     frame: false,
     transparent: true,
@@ -36,20 +40,6 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
-
-
-ipcMain.on('toMain', (event) => {
-  const template = [
-    {
-      label: 'Menu Item 1',
-      click: () => { event.sender.send('context-menu-command', 'menu-item-1') }
-    },
-    { type: 'separator' },
-    { label: 'Menu Item 2', type: 'checkbox', checked: true }
-  ]
-  const menu = Menu.buildFromTemplate(template)
-  menu.popup(BrowserWindow.fromWebContents(event.sender))
-})
+});

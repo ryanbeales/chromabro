@@ -1,6 +1,6 @@
 {
   "name": "chromabro",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A simple app that will take webcam input, use tensorflow+bodypix to segment the image in two parts (background and person) and place the video in the lower right of screen.",
   "main": "main.js",
   "scripts": {
@@ -19,7 +19,6 @@
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "electron": "^12.0.1",
     "electron-builder": "^22.10.5"
-
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
