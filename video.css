@@ -1,0 +1,32 @@
+/* Transparent background, allow dragging of window */
+body {
+    background: rgba(0,0,0,0); 
+    -webkit-app-region: drag
+}
+
+/* Flip output video horizontally */
+#renderedcanvas {
+    -moz-transform: scale(-1, 1); 
+    -webkit-transform: scale(-1, 1); 
+    -o-transform: scale(-1, 1); 
+    transform: scale(-1, 1); 
+    filter: FlipH;
+}
+
+#statsoverlay_background {
+    background-color: black;
+    opacity: 60%;
+    position: absolute;
+    left: 10;
+    top: 10;
+    z-index: 20;
+}
+
+#statsoverlay {
+    opacity: 100%;
+    font-family: sans-serif;
+    font-size: 10pt;
+    color: white;
+    line-height: 5px;
+    z-index: 30;
+}
