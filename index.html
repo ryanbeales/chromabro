@@ -8,26 +8,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
-
-    <script id='fragment-shader' type="glsl">
-      precision mediump float;
-
-      uniform sampler2D frame;
-      uniform sampler2D mask;
-      
-      uniform float texWidth;
-      uniform float texHeight;
-      
-      void main(void) {
-          vec2 texCoord = vec2(gl_FragCoord.x/texWidth, 1.0 - (gl_FragCoord.y/texHeight));
-          gl_FragColor = vec4(texture2D(frame, texCoord).rgb, texture2D(mask, texCoord).a * 255.);
-      }
-    </script>
   </head>
 
   <body style="background: rgba(0,0,0,0); -webkit-app-region: drag"  >
     <video id="video" hidden width="480" height="320" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
+    <canvas id="videocanvas" hidden></canvas>
+    <canvas id="renderedcanvas"></canvas>
+
   </body>
 
   <script src="video.js"></script>

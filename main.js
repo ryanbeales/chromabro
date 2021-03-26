@@ -17,7 +17,8 @@ function createWindow () {
     transparent: true,
     alwaysOnTop: true,
     x: display.bounds.width-480,
-    y: display.bounds.height-320
+    y: display.bounds.height-320,
+    hasShadow: false
   })
   win.setMenuBarVisibility(false)
   win.loadFile('index.html')
