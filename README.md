@@ -28,6 +28,9 @@ See releases. The app is not signed so you'll have to work around macos permissi
 - Push tags to origin `git push --tags origin`
 - Build will run and create a draft release.
 
+# Attribution
+App icon base by https://twemoji.twitter.com/, background was modified to green. Link to licence https://creativecommons.org/licenses/by/4.0/
+
 # References:
 
 ## External Libraries
