@@ -15,14 +15,17 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       enableRemoteModule: false,
-      devTools: false
+      devTools: false,
     },
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     x: display.bounds.width-480,
     y: display.bounds.height-320,
-    hasShadow: false
+    hasShadow: false,
+    maximizable: false,
+    resizable: false,
+    fullscreen: false
   })
   win.setMenuBarVisibility(false)
   win.loadFile('index.html')

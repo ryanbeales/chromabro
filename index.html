@@ -13,15 +13,22 @@
   </head>
 
   <body id="body">
-    <video id="video" hidden width="480" height="320" autoplay playsinline></video>
-    <canvas id="videocanvas" hidden></canvas>
+    <video id="video" width="480" height="320" hidden muted autoplay playsinline></video>
+    <canvas id="maskcanvas" hidden></canvas>
     <canvas id="renderedcanvas"></canvas>
-    <div id="statsoverlay_background" hidden>
+    <div id="statsoverlay_background">
       <div id="statsoverlay">
         <p>Video Framerate: <span id="statsoverlay-video-fps">0</span></p>
         <p>Segmentation framerate: <span id="statsoverlay-segmentation-fps">0</span></p>
-        <p>Bodypix multiplier: <span id="statsoverlay-multiplier">0</span></p>
-        <p>Bodypix internal resolution: <span id="statsoverlay-internal-resolution">0</span></p>
+
+        <template id='bodypix-config-option'>
+          <p><span class='option-name'>name</span><select class='option-values'></select></p>
+        </template>
+
+        <div id='bodypix-config'></div>
+        
+        <p>Press 's' to hide or show this overlay</p>
+        <p>Press 'q' to quit</p>
       </div>
     </div>
   </body>
