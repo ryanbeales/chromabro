@@ -47,3 +47,6 @@ App icon base by https://twemoji.twitter.com/, background was modified to green.
 ## Electron
 - https://www.electronjs.org/docs/tutorial/quick-start
 - https://github.com/samuelmeuli/action-electron-builder
+
+## Alpha masks
+- https://medium.com/@lucadeblasio/webdev-tips-alpha-mask-png-technique-3062451fc060
