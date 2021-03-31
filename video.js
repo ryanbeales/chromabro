@@ -80,7 +80,8 @@ let bodypix_config = new OptionsCycle([
 ]);
 
 let bodypix_detection_resolution = new OptionsCycle(['low', 'medium', 'high', 'full'], 1);
-let mask_blur_amount = new OptionsCycle(['none', 'blur(4px)','blur(8px)','blur(16px)'])
+let tensorflow_backends = new OptionsCycle(['webgl','wasm','cpu'])
+let cameraselection = null;
 
 function display_config() {
   let config = document.querySelector('#bodypix-config');
@@ -97,6 +98,8 @@ function display_config() {
     // Option name
     option.querySelector('.option-name').innerHTML = name
   
+
+    if (configelement == null) return;
     // Option values
     option_values = option.querySelector('.option-values')
 
@@ -123,13 +126,14 @@ function display_config() {
     config.appendChild(option)
   }
 
+  make_option_value('Camera', cameraselection, start_webcam)
   make_option_value('Background', background, null)
   make_option_value('Model', bodypix_config, start_bodypix)
   make_option_value('Multiplier', bodypix_config.get().multipliers, start_bodypix)
   make_option_value('Stride', bodypix_config.get().strides, start_bodypix)
   make_option_value('quantBytes', bodypix_config.get().quantBytes, start_bodypix)
   make_option_value('Internal Resolution', bodypix_detection_resolution, null)
-  make_option_value('Mask effect', mask_blur_amount, null)
+  make_option_value('Tensorflow Backend', tensorflow_backends, () => { tf.setBackend(tensorflow_backends.get()) })
 }
 
 // Called each time a frame is available on the incoming webcam video
@@ -212,18 +216,44 @@ async function createMask(now, metadata) {
   lastsegmentframetime = frameend
 }
 
+function find_video_devices() {
+  navigator.mediaDevices.enumerateDevices().then(
+    function(devices) {
+      console.log(devices)
+      videodevices = []
+      devices.forEach(
+        function(device) {
+          console.log(device.kind, device.label, device.deviceId);
+          
+          if (device.kind == 'videoinput') {
+            let label = device.label != '' ? device.label : device.kind
+            videodevices.push([device.label, device.deviceId])
+          }
+        }
+      )
+      cameraselection = new OptionsCycle(videodevices)
+      display_config()
+    }
+  )
+}
+
 // Start the webcam on videoElement
-function start_webcam() {
-  // Find some way to list and allow selection of cameras?
-  navigator.mediaDevices.getUserMedia({video: { facingMode: 'user', width: videoElement.width, height: videoElement.height}, audio: false})
+async function start_webcam() {
+  if (cameraselection) {
+    selectedcamera = { deviceId: cameraselection.get(), width: videoElement.width, height: videoElement.height}
+  } else {
+    selectedcamera = { facingMode: 'user', width: videoElement.width, height: videoElement.height}
+  }
+
+  await navigator.mediaDevices.getUserMedia({video: selectedcamera, audio: false})
     .then(stream => {
       videoElement.srcObject = stream;
-      // Don't make this automagic.
       videoElement.play();
     })
     .catch(err => {
       alert(`Following error occured: ${err}`);
     });
+  find_video_devices();
 }
 
 // Load bodypix
@@ -240,14 +270,10 @@ function start_bodypix() {
   display_config();
 }
 
-// Once the window is loaded start the webcam and bodypix
-window.onload = () => {
-  start_webcam();
-  start_bodypix();
-}
-
 // When the video has loaded
 videoElement.onloadeddata = () => {
+  // Create video selection options.
+
   // Set the canvases to the same size as the incoming video
   maskcanvas.width = videoElement.width;
   maskcanvas.height = videoElement.height;
@@ -258,21 +284,3 @@ videoElement.onloadeddata = () => {
   videoElement.requestVideoFrameCallback(renderVideo);
   videoElement.requestVideoFrameCallback(createMask);
 }
-
-
-window.addEventListener('dblclick', event => {
-  statsoverlay.hidden = !statsoverlay.hidden
-})
-
-
-// Key commands
-window.addEventListener("keyup", event => {
-  switch(event.key) {
-    case 's':
-      statsoverlay.hidden = !statsoverlay.hidden
-      break;
-    case 'q':
-      window.close();
-      break;
-  };
-});
