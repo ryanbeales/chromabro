@@ -8,12 +8,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.3.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.1.0"></script>
-
+    
     <link rel="stylesheet" href="video.css">
   </head>
 
   <body id="body">
-    <video id="video" width="480" height="320" hidden muted autoplay playsinline></video>
     <canvas id="maskcanvas" hidden></canvas>
     <canvas id="renderedcanvas"></canvas>
     <div id="statsoverlay_background">
@@ -34,4 +33,6 @@
   </body>
 
   <script src="video.js"></script>
+  <script src="standalone.js"></script>
+
 </html>
