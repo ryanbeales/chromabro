@@ -136,14 +136,11 @@ async function display_config() {
   make_option_value('Tensorflow Backend', tensorflow_backends, () => { tf.setBackend(tensorflow_backends.get()) })
 }
 
-// Called each time a frame is available on the incoming webcam video
-let lastvideoframetime = 0
 const statsoverlay_video_fps = document.querySelector('#statsoverlay-video-fps')
+let lastvideoframetime = 0;
 let lastvideoframerendered = 0;
 
-async function renderVideo(now, metadata) {
-    lastvideoframerendered = metadata.presentedFrames;
-
+function renderVideo(now, metadata) {
     renderedcontext.globalCompositeOperation = 'normal'
     renderedcontext.drawImage(videoElement,0,0)
 
@@ -155,12 +152,15 @@ async function renderVideo(now, metadata) {
     }
 
     // Make sure this function is called on next available frame
-    callbackid = videoElement.requestVideoFrameCallback(renderVideo)
+    if (lastvideoframetime != metadata.presentationTime) {
+      videoElement.requestVideoFrameCallback(renderVideo);
+    }
     
     //FPS calc
-    frameend = performance.now()
-    statsoverlay_video_fps.innerHTML = (1000 / (frameend-lastvideoframetime)).toFixed(0)
-    lastvideoframetime = frameend
+    statsoverlay_video_fps.innerHTML = (1000 / (metadata.presentationTime-lastvideoframetime)).toFixed(0)
+    lastvideoframetime = metadata.presentationTime
+
+    lastvideoframerendered = metadata.presentedFrames
 }
 
 // Use bodypix to take the incoming webcam data and run the segmentation
@@ -205,12 +205,12 @@ async function createMask(now, metadata) {
     maskcontext.putImageData(frame,0,0)
   }
   // Set up callback for next available frame
-  callbackid = videoElement.requestVideoFrameCallback(createMask);
-
+  if (lastsegmentframetime != metadata.presentationTime) {
+    videoElement.requestVideoFrameCallback(createMask);
+  }
   // FPS calc
-  frameend = performance.now()
-  statsoverlay_segementation_fps.innerHTML = (1000 / (frameend-lastsegmentframetime)).toFixed(0)
-  lastsegmentframetime = frameend
+  statsoverlay_segementation_fps.innerHTML = (1000 / (metadata.presentationTime-lastsegmentframetime)).toFixed(0)
+  lastsegmentframetime = metadata.presentationTime
 }
 
 function find_video_devices() {
