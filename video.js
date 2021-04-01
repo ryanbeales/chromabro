@@ -1,5 +1,5 @@
-// Incoming webcam video
-const videoElement = document.querySelector('#video');
+// Incoming webcam video, created by create_videoelement()
+let videoElement = null;
 
 // Canvas to render mask to
 const maskcanvas = document.querySelector('#maskcanvas');
@@ -83,7 +83,7 @@ let bodypix_detection_resolution = new OptionsCycle(['low', 'medium', 'high', 'f
 let tensorflow_backends = new OptionsCycle(['webgl','wasm','cpu'])
 let cameraselection = null;
 
-function display_config() {
+async function display_config() {
   let config = document.querySelector('#bodypix-config');
 
   while (config.hasChildNodes()) {
@@ -126,7 +126,7 @@ function display_config() {
     config.appendChild(option)
   }
 
-  make_option_value('Camera', cameraselection, start_webcam)
+  make_option_value('Camera', cameraselection, start_webcam);
   make_option_value('Background', background, null)
   make_option_value('Model', bodypix_config, start_bodypix)
   make_option_value('Multiplier', bodypix_config.get().multipliers, start_bodypix)
@@ -139,8 +139,11 @@ function display_config() {
 // Called each time a frame is available on the incoming webcam video
 let lastvideoframetime = 0
 const statsoverlay_video_fps = document.querySelector('#statsoverlay-video-fps')
+let lastvideoframerendered = 0;
 
-function renderVideo(now, metadata) {
+async function renderVideo(now, metadata) {
+    lastvideoframerendered = metadata.presentedFrames;
+
     renderedcontext.globalCompositeOperation = 'normal'
     renderedcontext.drawImage(videoElement,0,0)
 
@@ -150,9 +153,10 @@ function renderVideo(now, metadata) {
       }
       renderedcontext.drawImage(maskcanvas,0,0)      
     }
-    // Make sure this function is called on next available frame
-    videoElement.requestVideoFrameCallback(renderVideo)
 
+    // Make sure this function is called on next available frame
+    callbackid = videoElement.requestVideoFrameCallback(renderVideo)
+    
     //FPS calc
     frameend = performance.now()
     statsoverlay_video_fps.innerHTML = (1000 / (frameend-lastvideoframetime)).toFixed(0)
@@ -165,7 +169,7 @@ const statsoverlay_segementation_fps = document.querySelector('#statsoverlay-seg
 
 async function createMask(now, metadata) {
   // If bodypix is loaded
-  if (net && background.get() != 1) {
+  if (videoElement && net && background.get() != 1) {
     segment = await net.segmentPerson(videoElement, {internalResolution: bodypix_detection_resolution.get()});
 
     // Get video frame data
@@ -199,16 +203,9 @@ async function createMask(now, metadata) {
     }
 
     maskcontext.putImageData(frame,0,0)
-    
-    // Blur works like this, but isn't not quite right..
-    if (mask_blur_amount.selected() != 'none') {
-      maskcontext.filter = mask_blur_amount.get()
-      // Draw canvas to itself to render the blur
-      maskcontext.drawImage(maskcanvas,0,0);
-    }
   }
   // Set up callback for next available frame
-  videoElement.requestVideoFrameCallback(createMask)
+  callbackid = videoElement.requestVideoFrameCallback(createMask);
 
   // FPS calc
   frameend = performance.now()
@@ -217,44 +214,137 @@ async function createMask(now, metadata) {
 }
 
 function find_video_devices() {
-  navigator.mediaDevices.enumerateDevices().then(
-    function(devices) {
-      console.log(devices)
-      videodevices = []
-      devices.forEach(
-        function(device) {
-          console.log(device.kind, device.label, device.deviceId);
-          
-          if (device.kind == 'videoinput') {
-            let label = device.label != '' ? device.label : device.kind
-            videodevices.push([device.label, device.deviceId])
+  if (!cameraselection) {
+    navigator.mediaDevices.enumerateDevices().then(
+      function(devices) {
+        videodevices = [];
+        devices.forEach(
+          function(device) {
+            if (device.kind == 'videoinput') {
+              let label = device.label != '' ? device.label : device.kind;
+              videodevices.push([device.label, device.deviceId]);
+            }
           }
-        }
-      )
-      cameraselection = new OptionsCycle(videodevices)
-      display_config()
-    }
-  )
+        )
+        cameraselection = new OptionsCycle(videodevices);
+        display_config();
+      }
+    )
+    start_webcam();
+  }
 }
 
-// Start the webcam on videoElement
-async function start_webcam() {
+
+/* 
+This is a workaround for requestVideoFrameCallback, when the camera source is changed the callback never fires again.
+Here we add a new element for each change of video source to make sure that requestVideoFrameCallback works.
+*/
+async function create_videoelement() {
+  // Stop and remove the old video element
+  if (videoElement) {
+    if (videoElement.srcObject) {
+      videoElement.srcObject.getTracks().forEach( track => {
+        track.stop();
+      });
+    }
+    videoElement.remove();
+  }
+
+  // Create a new video element
+  body = document.querySelector('#body');
+  new_videoElement = document.createElement('video');
+  new_videoElement.id = '#video'
+  new_videoElement.width = 480.
+  new_videoElement.height = 320;
+  new_videoElement.muted = true;   
+  new_videoElement.autoplay = true;
+  new_videoElement.playsinline = true;
+  new_videoElement.hidden = true;
+
+  // Append element back to body
+  body.appendChild(new_videoElement);
+}
+
+async function start_camera() {
+  // If the camera selection is populated by find_video_devices then use the selected camera
   if (cameraselection) {
     selectedcamera = { deviceId: cameraselection.get(), width: videoElement.width, height: videoElement.height}
   } else {
     selectedcamera = { facingMode: 'user', width: videoElement.width, height: videoElement.height}
   }
 
+  // Add the selected webcam stream to the videoElement
   await navigator.mediaDevices.getUserMedia({video: selectedcamera, audio: false})
     .then(stream => {
       videoElement.srcObject = stream;
       videoElement.play();
     })
     .catch(err => {
-      alert(`Following error occured: ${err}`);
+      console.log('Following error occured:', err);
+      // Retry...
+      start_webcam();
     });
+
+  // Find video devices now that we have permissions to find them, will populate cameraselection
   find_video_devices();
 }
+
+
+// Start the webcam on videoElement
+async function start_webcam() {
+  // Disable bodypix
+  net = null;
+
+  // Create new video element.
+  // There is something stale left in the element that prevents callbacks from working otherwise.
+  create_videoelement();
+
+  // Find new element
+  videoElement = document.querySelector('video');
+  // Start camera in new element
+  start_camera();
+  start_bodypix();
+
+  // Called when frame is ready
+  videoElement.onloadeddata = () => {
+    maskcanvas.width = videoElement.width;
+    maskcanvas.height = videoElement.height;
+    renderedcanvas.width = videoElement.width
+    renderedcanvas.height = videoElement.height;
+  };
+
+  // After the playing event, the last thing before it's actually started playing, register the callbacks
+  videoElement.addEventListener('canplaythrough', event => {
+    videoElement.requestVideoFrameCallback(renderVideo);
+    videoElement.requestVideoFrameCallback(createMask);
+  });
+
+  videoElement.addEventListener('emptied', event => {
+    net = null; // Disable bodypix, if callbacks fire then they won't process anything.
+  });
+
+
+  /*
+     For some reason callbacks fail to work after the video source is switched.
+     There is an event or activity that is triggered that we don't see which cancels the callbacks.
+
+     Here on every video progress update (Every second?) we check what frame we rendered last;
+     If it's more than 10 frames away from the current frame count then the callbacks aren't working.
+     To fix the problem we just recreate everything and it starts to work again. ¯\_(ツ)_/¯
+
+     I don't know why. I wish I knew because that would have saved 4 days of stress...
+
+    This is the key to making a switching camera source and a working requestVideoFrameCallback.
+  */
+  videoElement.addEventListener('progress', event => {
+    // Wait for 10 frames, if we're not processing anything recreate everything and of course it starts to work...
+    if (lastvideoframerendered+10 < videoElement.webkitDecodedFrameCount) {
+      console.log('failing on callbacks here... retrying');
+      start_webcam();
+    }
+  });
+}
+
 
 // Load bodypix
 function start_bodypix() {
@@ -268,19 +358,4 @@ function start_bodypix() {
     quantBytes: bodypix_config.get().quantBytes.get()
   }).then(function (net2) { net = net2; });
   display_config();
-}
-
-// When the video has loaded
-videoElement.onloadeddata = () => {
-  // Create video selection options.
-
-  // Set the canvases to the same size as the incoming video
-  maskcanvas.width = videoElement.width;
-  maskcanvas.height = videoElement.height;
-  renderedcanvas.width = videoElement.width;
-  renderedcanvas.height = videoElement.height;
-
-  // Trigger the processing for each incoming frame
-  videoElement.requestVideoFrameCallback(renderVideo);
-  videoElement.requestVideoFrameCallback(createMask);
 }
