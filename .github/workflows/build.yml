@@ -7,7 +7,6 @@ on:
 
 jobs:
   # Build binaries for Windows and Macos
-  # TODO: Ubuntu build fails because we need to install snap first
   release:
     runs-on: ${{ matrix.os }}
     permissions:
@@ -30,14 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and Release
+      - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --publish always
-
-      - name: Delete older releases
-        uses: dev-drprasad/delete-older-releases@v0.3.4
-        with:
-          keep_latest: 3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx run publish

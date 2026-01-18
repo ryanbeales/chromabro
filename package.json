@@ -7,27 +7,17 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "dist": "electron-builder"
+    "publish": "electron-forge publish"
   },
   "keywords": [],
   "author": "Ryan Beales",
   "license": "ISC",
   "devDependencies": {
-    "@electron-forge/cli": "^7.2.0",
-    "@electron-forge/maker-deb": "^7.2.0",
-    "@electron-forge/maker-rpm": "^7.2.0",
-    "@electron-forge/maker-squirrel": "^7.2.0",
-    "@electron-forge/maker-zip": "^7.2.0",
-    "electron": "^33.2.0",
-    "electron-builder": "^24.13.3"
-  },
-  "dependencies": {},
-  "build": {
-    "appId": "com.ryanbeales.chromabro",
-    "productName": "Chromabro",
-    "win": {
-      "target": "nsis"
-    }
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/publisher-github": "^7.11.1",
+    "electron": "^40.0.0"
   },
   "config": {
     "forge": {
@@ -44,14 +34,18 @@
           "platforms": [
             "darwin"
           ]
-        },
+        }
+      ],
+      "publishers": [
         {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": {
+              "owner": "ryanbeales",
+              "name": "chromabro"
+            },
+            "prerelease": false
+          }
         }
       ]
     }
