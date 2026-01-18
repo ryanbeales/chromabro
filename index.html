@@ -1,38 +1,48 @@
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;" />
 
-    <title>Chromabro</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="Content-Security-Policy"
+    content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;" />
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.3.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.1.0"></script>
-    
-    <link rel="stylesheet" href="video.css">
-  </head>
+  <title>Chromabro</title>
 
-  <body id="body">
-    <canvas id="maskcanvas" hidden></canvas>
-    <canvas id="renderedcanvas"></canvas>
-    <div id="statsoverlay_background">
-      <div id="statsoverlay">
-        <p>Video Framerate: <span id="statsoverlay-video-fps">0</span></p>
-        <p>Segmentation framerate: <span id="statsoverlay-segmentation-fps">0</span></p>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-segmentation"></script>
 
-        <template id='bodypix-config-option'>
-          <p><span class='option-name'>name</span><select class='option-values'></select></p>
-        </template>
+  <link rel="stylesheet" href="video.css">
+</head>
 
-        <div id='bodypix-config'></div>
-        
-        <p>Press 's' to hide or show this overlay</p>
-        <p>Press 'q' to quit</p>
-      </div>
+<body id="body">
+  <canvas id="maskcanvas" hidden></canvas>
+  <canvas id="renderedcanvas"></canvas>
+  <div id="statsoverlay_background">
+    <div id="statsoverlay">
+      <p>Video Framerate: <span id="statsoverlay-video-fps">0</span></p>
+      <p>Segmentation framerate: <span id="statsoverlay-segmentation-fps">0</span></p>
+
+      <p>Edge Smoothness: <span id="smoothness-value">2</span>
+        <br><input type="range" id="edge-smoothness" name="edge-smoothness" min="0" max="10" value="2">
+      </p>
+      <p>Mask Opacity: <span id="opacity-value">1.0</span>
+        <br><input type="range" id="mask-opacity" name="mask-opacity" min="0" max="1" step="0.1" value="1">
+      </p>
+
+      <template id='bodypix-config-option'>
+        <p><span class='option-name'>name</span><select class='option-values'></select></p>
+      </template>
+
+      <div id='bodypix-config'></div>
+
+      <p>Press 's' to hide or show this overlay</p>
+      <p>Press 'q' to quit</p>
     </div>
-  </body>
+  </div>
+</body>
 
-  <script src="video.js"></script>
-  <script src="standalone.js"></script>
+<script src="video.js"></script>
+<script src="standalone.js"></script>
 
 </html>
