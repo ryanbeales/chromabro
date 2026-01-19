@@ -1,9 +1,11 @@
 # What is this?
-A simple app that will take webcam input, use tensorflow+bodypix to segment the image in two parts (background and person) and display in the bottom right corner of the screen with a transparent background.
+A simple app that will take webcam input, use tensorflow+body-segmentation or MediaPipe Selfie Segmentation to segment the image in two parts (background and person) and display in the bottom right corner of the screen with a transparent background.
 
 See references below for a detailed explaination on how this works.
 
-This is like what some other apps use for the same effect (Zoom, Teams, Nvidia Broadcast RTX thing, Xsplit, Chromacam) but free. And since it's free maybe if you use it you could swing some coffee money my way...
+For a better idea of _what_ this is, I just found this video for using this tool in OBS here: [https://www.youtube.com/watch?v=B0oYpxG9_CM](https://www.youtube.com/watch?v=B0oYpxG9_CM). 
+
+This is like what some other apps use for the same effect (Zoom, Teams, Nvidia Broadcast RTX thing, Xsplit, Chromacam) but free, and works on macos and windows.
 
 The intended use for this was to add to desktop sharing for zoom meetings on macos. It was developed on windows.
 
