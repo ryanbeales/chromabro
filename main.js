@@ -1,5 +1,14 @@
 const { app, BrowserWindow, screen } = require('electron')
 
+// Handle Squirrel.Windows install/update/uninstall events.
+// When launched by the installer with --squirrel-* args, this module
+// creates/removes shortcuts and returns true so we quit immediately,
+// preventing a second overlay window from spawning alongside the real launch.
+if (require('electron-squirrel-startup')) {
+  app.quit()
+  return
+}
+
 const path = require('path')
 
 let win;
@@ -29,6 +38,17 @@ function createWindow () {
   })
   win.setMenuBarVisibility(false)
   win.loadFile('index.html')
+
+  // The constructor's alwaysOnTop defaults to 'floating', which full-screen
+  // Chromium windows and some conferencing apps can still cover. 'screen-saver'
+  // is the highest standard level.
+  win.setAlwaysOnTop(true, 'screen-saver')
+  win.setVisibleOnAllWorkspaces(true)
+
+  // If another app steals focus and demotes our z-order, reassert it.
+  win.on('blur', () => {
+    win.setAlwaysOnTop(true, 'screen-saver')
+  })
 }
 
 app.whenReady().then(() => {
