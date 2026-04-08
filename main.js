@@ -38,6 +38,17 @@ function createWindow () {
   })
   win.setMenuBarVisibility(false)
   win.loadFile('index.html')
+
+  // The constructor's alwaysOnTop defaults to 'floating', which full-screen
+  // Chromium windows and some conferencing apps can still cover. 'screen-saver'
+  // is the highest standard level.
+  win.setAlwaysOnTop(true, 'screen-saver')
+  win.setVisibleOnAllWorkspaces(true)
+
+  // If another app steals focus and demotes our z-order, reassert it.
+  win.on('blur', () => {
+    win.setAlwaysOnTop(true, 'screen-saver')
+  })
 }
 
 app.whenReady().then(() => {
