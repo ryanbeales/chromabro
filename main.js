@@ -1,5 +1,14 @@
 const { app, BrowserWindow, screen } = require('electron')
 
+// Handle Squirrel.Windows install/update/uninstall events.
+// When launched by the installer with --squirrel-* args, this module
+// creates/removes shortcuts and returns true so we quit immediately,
+// preventing a second overlay window from spawning alongside the real launch.
+if (require('electron-squirrel-startup')) {
+  app.quit()
+  return
+}
+
 const path = require('path')
 
 let win;
